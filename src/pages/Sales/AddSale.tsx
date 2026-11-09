@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { cartLineCount, cartSubtotal } from '../../utils/cart';
 import PageMeta from '../../components/common/PageMeta';
 import Button from '../../components/ui/button/Button';
 import Select from '../../components/form/Select';
@@ -469,18 +470,18 @@ export default function AddSale() {
             <div className="border-t pt-4 space-y-3 dark:text-gray-400">
               <div className="flex justify-between">
                 <span>Total Items:</span>
-                <span className="font-bold">{saleItems.filter(i => i.item_id).length}</span>
+                <span className="font-bold">{cartLineCount(saleItems)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Net Total:</span>
                 <span className="font-bold">
-                  {saleItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0).toFixed(2)}
+                  {cartSubtotal(saleItems).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Tax (0%):</span>
                 <span className="font-bold">
-                  {(saleItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0) * 0.00).toFixed(2)}
+                  {(cartSubtotal(saleItems) * 0.0).toFixed(2)}
                 </span>
               </div>
               {/* <div className="flex justify-between">
@@ -490,7 +491,7 @@ export default function AddSale() {
               <div className="flex justify-between text-lg font-bold border-t pt-2">
                 <span>Grand Total:</span>
                 <span>
-                  {(saleItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0) * 1.00).toFixed(2)}
+                  {(cartSubtotal(saleItems) * 1.0).toFixed(2)}
                 </span>
               </div>
             </div>
