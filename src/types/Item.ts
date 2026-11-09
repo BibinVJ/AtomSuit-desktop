@@ -9,12 +9,9 @@ export interface Item {
   category: Category;
   unit: Unit;
   type: string;
-  selling_price: number;
-  is_active: boolean;
   stock_on_hand?: number;
   non_expired_stock?: number;
   expired_stock?: number;
-  is_expired_sale_enabled?: boolean;
 }
 
 export interface ItemApiResponse {

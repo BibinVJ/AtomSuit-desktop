@@ -12,7 +12,15 @@ export default defineConfig(({ mode }) => {
   plugins: [react(), svgr()],
   server: {
     port: 5173,
-    strictPort: true
+    strictPort: true,
+    proxy: {
+      '/tenant-probe': {
+        target: env.API_BASE_URL || 'http://localhost:3000/api',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/tenant-probe/, ''),
+      },
+    },
   },
   css: {
     postcss: './postcss.config.js',

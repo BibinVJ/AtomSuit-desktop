@@ -8,7 +8,7 @@ import { isApiError } from "../../utils/errors";
 import { toast } from "sonner";
 
 const SignInForm = () => {
-  const [form, setForm] = useState({ identifier: "1234567890", password: "Example@123" }); // identifier = email or mobile
+  const [form, setForm] = useState({ identifier: "", password: "" }); // identifier = email or mobile
   const [errors, setErrors] = useState({ identifier: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -10,6 +10,8 @@ let mainWindow: BrowserWindow | null = null;
 const isDev = process.env.NODE_ENV === "development";
 
 function createWindow() {
+  const preloadPath = path.join(__dirname, 'preload.js');
+
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 900,
@@ -17,6 +19,9 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: preloadPath,
+      // Disable CORS in dev to allow local renderer to call API directly
+      webSecurity: !isDev ? true : false,
     },
   });
 

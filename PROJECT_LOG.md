@@ -22,6 +22,33 @@ file to catch up before starting work; append an entry when you finish anything 
 
 # Log
 
+## 2026-11-09 — Merge origin/develop: Vite 7, multi-tenancy, and a stale test corrected
+- **Type:** chore/fix
+- **What / Why:** `develop` had diverged — 2 local commits against 8 on the remote. Merged.
+  Three files conflicted: `AGENTS.md`, `package.json`, `package-lock.json`.
+- **The one that mattered: the remote upgraded Vite 5 → 7.** Vitest was pinned to **v2
+  specifically because this project was on Vite 5**, and Vitest 2 peer-depends on Vite 5 — so
+  "keep both sides" would have produced an unresolvable tree. Vitest and `@vitest/coverage-v8`
+  moved to **^3.2.4** to match. Shared dev dependencies took the remote's newer versions
+  (React types 18 → 19, eslint, typescript-eslint, `@vitejs/plugin-react` 4 → 5); the test-only
+  packages this branch added were kept. `package-lock.json` was regenerated rather than
+  hand-merged.
+- **`AGENTS.md`:** kept this branch's detailed guide (it matches the other repos' convention and
+  carries the AI startup prompt and the reality check) over the remote's thinner version, then
+  **corrected the claims the merge made false** — "no tenant awareness" and "no test script" were
+  both true when written and are not any more. Folded in the remote's multi-tenant rules.
+- **A test was passing for the wrong reason.** The characterisation test asserting `X-Tenant` was
+  never sent still passed after the merge — not because the gap survived, but because the new
+  interceptor only attaches the header when a tenant is in localStorage, and the test set none. It
+  was documenting a gap that no longer exists, so it was replaced by three real ones (sent when
+  chosen, omitted when not, picked up mid-session).
+- **Impact:** `npm test` **52 passed** (was 50), `type-check` clean, `lint` unchanged (8
+  pre-existing warnings, 0 errors), `npm run build` passes under Vite 7. A
+  `backup/pre-merge-20261109` branch was left in place.
+- **Still open:** `AddSale` computes its own totals with tax hardcoded to 0 — unchanged by the
+  merge, and still needs a product decision.
+- **Ref:** develop
+
 ## 2026-09-20 — Test harness + first 50 tests (repo had none)
 - **Type:** test/chore
 - **What / Why:** The desktop repo had no test runner and no tests. Added **Vitest** — it shares the
@@ -46,9 +73,10 @@ file to catch up before starting work; append an entry when you finish anything 
      discounts entirely and will not match the invoice the backend returns. This contradicts the
      "backend owns all money math" rule. Fixing it properly needs either a server-side totals
      preview endpoint or a UI that defers the total to checkout.
-  2. **No `X-Tenant` header.** `src/services/api.ts` never sends it, so one build cannot serve
-     multiple tenants (desktop tenant-awareness is a Phase 2 item). A characterisation test records
-     the current behaviour and is written to fail once tenancy lands, as the reminder to update it.
+  2. ~~**No `X-Tenant` header.**~~ **Closed by the merge with `origin/develop`** (`feat:added multi
+     tenancy`): `src/services/api.ts` now sends `x-tenant` per request from localStorage. The
+     characterisation test was replaced with three that assert the header is sent when a tenant is
+     chosen, omitted when none is, and picked up mid-session without a restart.
 - **Impact:** `npm run test` (50 passed), `type-check` clean, `lint` unchanged (6 pre-existing
   warnings, 0 errors, none in new files), `build` passes. The empty offline stubs
   (`electron/services/{syncService,offlineGuard,database}.ts`, 0 bytes) remain untested because

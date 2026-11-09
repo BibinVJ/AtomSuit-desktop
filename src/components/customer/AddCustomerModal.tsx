@@ -58,7 +58,7 @@ export default function AddCustomerModal({ isOpen, onClose, onCustomerAdded }: P
     }
 
     try {
-      const response = await addCustomer({ name, email, phone, address, is_active: true });
+      const response = await addCustomer({ name, email, phone, address });
       onCustomerAdded(response.data);
       toast.success('Customer added successfully');
       handleClose();

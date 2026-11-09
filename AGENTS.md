@@ -9,7 +9,12 @@ file, then [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`CONTRIBUTING.md`](CONTRIBU
 > `electron/services/{database,syncService,offlineGuard}.ts` are **empty files**, and
 > `electron/preload.ts` + `electron/ipcHandlers/*` are **dead code** (the preload is never
 > loaded and no `ipcMain.handle` is registered). Do **not** assume offline, SQLite, sync, IPC,
-> tenancy, or auto-update work. The target offline design is in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+> or auto-update work. The target offline design is in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+>
+> **Multi-tenancy IS wired** (as of the `feat:added multi tenancy` work): the client sends the
+> `x-tenant` header from `src/services/api.ts`, with tenant setup in
+> `src/components/tenant/TenantSetup.tsx`. Reuse that client — never construct your own axios
+> instance, or the header goes missing and the API silently answers in the central context.
 
 ## AI startup prompt (paste at the start of an AI session)
 
@@ -18,21 +23,29 @@ You are working on the Atom Suit DESKTOP POS — Electron 38 + React 18 + Vite +
 Tailwind v3. It is currently ONLINE-ONLY: the renderer calls the backend API directly via axios
 (src/services/*). The electron/ offline services (database.ts, syncService.ts, offlineGuard.ts)
 are EMPTY stubs; preload.ts and ipcHandlers/* are DEAD code (preload never loaded, no
-ipcMain.handle). There is no local DB, no sync, no tenant awareness, no device licensing, no
-auto-updater. Read AGENTS.md, ARCHITECTURE.md, and the recent PROJECT_LOG.md entries first (so
+ipcMain.handle). There is no local DB, no sync, no device licensing, no auto-updater. Tenancy IS
+wired: api.ts sends the `x-tenant` header. Read AGENTS.md, ARCHITECTURE.md, and the recent PROJECT_LOG.md entries first (so
 you don't undo or duplicate recent work). Rules:
 1. The backend owns all business logic and money math — the POS sends inputs and renders the
    backend's numbers (invoice number comes from the backend).
-2. Run it with `npm start` (there is NO `npm run dev` and NO test script). Build: `npm run build`.
+2. Run it with `npm start` (there is NO `npm run dev`). Test with `npm test` (Vitest).
+   Build: `npm run build`.
 3. Match existing structure: screens in src/pages, data in src/services (axios → backend),
    shared UI in src/components, auth via AuthContext + hasPermission(). HashRouter is used.
 4. If asked to add OFFLINE support, follow the Independent-Node target design in ARCHITECTURE.md
    (local SQLite outbox + idempotent server sync + server-authoritative invoice numbers). Wire
    the preload/IPC properly (renderer must NOT touch the DB directly). Do NOT pretend offline
    already works.
-Before finishing: npm run lint · npm run type-check · npm run build. Append an entry to
+Before finishing: npm run lint · npm run type-check · npm test · npm run build. Append an entry to
 PROJECT_LOG.md (newest on top: date, type, what/why, impact, ref).
 ```
+
+## Multi-tenant rules
+
+- Tenant context travels in the **`x-tenant`** header, attached centrally in
+  `src/services/api.ts`. Never build your own axios instance.
+- Keep auth, token and tenant behaviour aligned with the existing desktop flow
+  (`AuthContext`, `TenantSetup`).
 
 ## Stack
 

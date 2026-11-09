@@ -3,7 +3,6 @@ export interface Unit {
   name: string;
   code: string;
   description: string;
-  is_active: boolean;
 }
 
 export interface UnitApiResponse {

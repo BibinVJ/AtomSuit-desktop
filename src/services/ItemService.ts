@@ -14,12 +14,12 @@ export const getItem = async (id: string): Promise<Item> => {
     return response.data.data;
 };
 
-export const addItem = async (item: { sku: string; name: string; category_id: string; unit_id: string; description: string; is_active: boolean; type: string; }) => {
+export const addItem = async (item: { sku: string; name: string; category_id: string; unit_id: string; description: string; type: string; }) => {
     const response = await api.post('/item', item);
     return response.data;
 };
 
-export const updateItem = async (id: number, item: { sku: string; name: string; category_id: string; unit_id: string; description: string; is_active: boolean; type: string; }) => {
+export const updateItem = async (id: number, item: { sku: string; name: string; category_id: string; unit_id: string; description: string; type: string; }) => {
     const response = await api.put(`/item/${id}`, item);
     return response.data;
 };

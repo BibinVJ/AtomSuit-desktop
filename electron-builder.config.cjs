@@ -61,12 +61,13 @@ module.exports = {
         Categories: 'Office;Finance;Business;'
       }
     },
-    icon: 'build/icon.png'
+    icon: 'build/icon.png',
+    executableArgs: ['--no-sandbox', '--disable-dev-shm-usage']
   },
   deb: {
     depends: [
       'libgtk-3-0',
-      'libnotify4', 
+      'libnotify4 | libnotify-bin', 
       'libnss3',
       'libxss1',
       'libxtst6',
@@ -75,13 +76,8 @@ module.exports = {
       'libuuid1',
       'libsecret-1-0'
     ],
-    recommends: [
-      'libappindicator3-1'
-    ],
     priority: 'optional',
-    category: 'office',
-    afterInstall: 'build/deb-postinst.sh',
-    afterRemove: 'build/deb-postrm.sh'
+    category: 'office'
   },
   nsis: {
     oneClick: false,

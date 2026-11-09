@@ -20,7 +20,6 @@ export interface Sale {
   payment_status: string;
   payment_method: string;
   note?: string;
-  is_active: boolean;
   items: SaleItem[];
 }
 

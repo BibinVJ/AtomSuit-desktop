@@ -2,6 +2,7 @@ import axios from 'axios';
 import NProgress from 'nprogress';
 // import { toast } from 'sonner';
 
+// Initialize axios instance
 const api = axios.create({
   baseURL: process.env.API_BASE_URL || 'http://localhost:3000/api',
   headers: {
@@ -10,11 +11,22 @@ const api = axios.create({
   }
 });
 
+// Set default tenant header if already stored
+const initialTenant = localStorage.getItem('tenant');
+if (initialTenant) {
+  api.defaults.headers.common['x-tenant'] = initialTenant;
+}
+
 api.interceptors.request.use(config => {
   NProgress.start();
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  // Always attach current tenant header if available
+  const tenant = localStorage.getItem('tenant');
+  if (tenant) {
+    config.headers['x-tenant'] = tenant;
   }
   return config;
 });

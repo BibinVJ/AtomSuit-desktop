@@ -9,12 +9,12 @@ export const getCustomers = async (page = 1, limit = 10, sortCol = 'created_at',
   return response.data;
 };
 
-export const addCustomer = async (customer: { name: string; email: string; phone: string; address: string; is_active: boolean; }) => {
+export const addCustomer = async (customer: { name: string; email: string; phone: string; address: string; }) => {
     const response = await api.post('/customer', customer);
     return response.data;
 };
 
-export const updateCustomer = async (id: number, customer: { name: string; email: string; phone: string; address: string; is_active: boolean; }) => {
+export const updateCustomer = async (id: number, customer: { name: string; email: string; phone: string; address: string; }) => {
     const response = await api.put(`/customer/${id}`, customer);
     return response.data;
 };

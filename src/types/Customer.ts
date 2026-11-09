@@ -6,7 +6,6 @@ export interface Customer {
   address: string;
   profile_image?: string;
   total_spent?: number;
-  is_active: boolean;
 }
 
 export interface CustomerApiResponse {

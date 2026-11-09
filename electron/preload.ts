@@ -15,3 +15,7 @@ contextBridge.exposeInMainWorld('api', {
   addSale: (sale: any) => ipcRenderer.invoke('api:addSale', sale),
   getSales: () => ipcRenderer.invoke('api:getSales'),
 });
+
+contextBridge.exposeInMainWorld('tenant', {
+  validate: (subdomain: string) => ipcRenderer.invoke('tenant:validate', subdomain),
+});

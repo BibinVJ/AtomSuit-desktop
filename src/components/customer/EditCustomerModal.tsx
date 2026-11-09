@@ -33,7 +33,6 @@ export default function EditCustomerModal({ isOpen, onClose, onCustomerUpdated, 
       setEmail(customer.email);
       setPhone(customer.phone);
       setAddress(customer.address || '');
-      setIsActive(customer.is_active);
     }
   }, [customer]);
 
@@ -59,7 +58,7 @@ export default function EditCustomerModal({ isOpen, onClose, onCustomerUpdated, 
     }
 
     try {
-      await updateCustomer(customer.id, { name, email, phone, address, is_active: isActive });
+      await updateCustomer(customer.id, { name, email, phone, address });
       onCustomerUpdated();
       toast.success('Customer updated successfully');
       onClose();

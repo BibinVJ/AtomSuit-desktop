@@ -93,19 +93,47 @@ describe('api client', () => {
   });
 
   /**
-   * Characterisation test for a known gap, not an endorsement.
+   * Tenant routing. Without this header the API silently answers in the CENTRAL context rather
+   * than failing, so a missing one is invisible until the data looks wrong.
    *
-   * The web frontend sends `X-Tenant` on every request; the desktop client does not, which is why
-   * one build cannot yet serve multiple tenants (desktop tenant-awareness is a Phase 2 item in
-   * DEVELOPMENT_PLAN.md). When that lands, this test should be replaced by one asserting the header
-   * IS sent — its failure is the reminder.
+   * (This replaces an earlier characterisation test that recorded the header as missing — it was
+   * added by the `feat:added multi tenancy` work on develop.)
    */
-  it('does NOT yet send the X-Tenant header (known gap)', async () => {
+  it('sends the x-tenant header when a tenant is stored', async () => {
     localStorage.setItem('token', 'abc123');
+    localStorage.setItem('tenant', 'acme');
     const api = await loadApi();
     const scoped = new MockAdapter(api);
     scoped.onGet('/items').reply((config) => {
-      expect(config.headers?.['X-Tenant']).toBeUndefined();
+      expect(config.headers?.['x-tenant']).toBe('acme');
+      return [200, { data: [] }];
+    });
+
+    await api.get('/items');
+    scoped.restore();
+  });
+
+  it('omits the tenant header when no tenant has been chosen', async () => {
+    // Before tenant setup the client is legitimately central-context; it must not invent a tenant.
+    const api = await loadApi();
+    const scoped = new MockAdapter(api);
+    scoped.onGet('/items').reply((config) => {
+      expect(config.headers?.['x-tenant']).toBeUndefined();
+      return [200, { data: [] }];
+    });
+
+    await api.get('/items');
+    scoped.restore();
+  });
+
+  it('picks up a tenant chosen after the client was created', async () => {
+    // TenantSetup writes to localStorage mid-session; the interceptor reads it per request, so a
+    // switch must not need an app restart.
+    const api = await loadApi();
+    localStorage.setItem('tenant', 'globex');
+    const scoped = new MockAdapter(api);
+    scoped.onGet('/items').reply((config) => {
+      expect(config.headers?.['x-tenant']).toBe('globex');
       return [200, { data: [] }];
     });
 
